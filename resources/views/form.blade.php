@@ -6,28 +6,7 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<title>Test HTML input</title>
-	<style>
-		#app {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			height: 100vh;
-			background-color: #f2f6f7;
-		}
-
-		.form-wrapper {
-			padding: 2rem;
-			background: #fff;
-		}
-
-		label {
-			display: block;
-		}
-
-		p {
-			margin-bottom: 2rem;
-		}
-	</style>
+	<link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
 	<div id="app">

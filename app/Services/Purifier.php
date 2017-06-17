@@ -4,6 +4,7 @@ namespace App\Services;
 
 use HTMLPurifier;
 use HTMLPurifier_Config;
+use HTMLPurifier_Bootstrap;
 use HTMLPurifier_TagTransform_Simple;
 
 class Purifier  {
@@ -18,6 +19,7 @@ class Purifier  {
 	public function clean($html)
 	{
 		require base_path('vendor/ezyang/htmlpurifier/library/') . 'HTMLPurifier.auto.php';
+		HTMLPurifier_Bootstrap::registerAutoload();
 		$config = HTMLPurifier_Config::createDefault();
 		$config->loadArray([
 			'Core.Encoding' => 'UTF-8',
@@ -25,6 +27,7 @@ class Purifier  {
 			'HTML.Allowed' => 'h1,h2,b,strong,i,em,a[href|title],ul,ol,li,p[style],br,span[style],img[width|height|alt|src]',
 			'CSS.AllowedProperties' => 'font,font-size,font-weight,font-style,font-family,text-decoration,color,background-color,text-align',
 			'AutoFormat.AutoParagraph' => true,
+			'AutoFormat.Linkify' => true,
 			'AutoFormat.RemoveEmpty' => true,
 		    'AutoFormat.RemoveSpansWithoutAttributes' => true,
 		]);

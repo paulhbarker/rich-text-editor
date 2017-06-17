@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Purifier;
 use Illuminate\Http\Request;
 
 class TestController extends Controller
@@ -12,6 +13,15 @@ class TestController extends Controller
 
     public function submit(Request $request)
     {
-    	return $request->all();
+    	$purifier = new Purifier();
+	    $body = $purifier->clean($request->body);
+    	return json_encode([
+    		'data' => [
+    			'title' => $request->title,
+		        'body' => $body,
+		    ],
+	        'success' => true,
+	        'status' => 200
+	    ]);
     }
 }

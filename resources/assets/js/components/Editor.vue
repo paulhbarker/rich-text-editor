@@ -1,7 +1,7 @@
 <template>
 	<div class="quill-editor">
 		<slot name="toolbar"></slot>
-		<div ref="editor"></div>
+		<div id='quill' ref="editor"></div>
 	</div>
 </template>
 
@@ -65,6 +65,7 @@
 						: this.defaultModules.toolbar;
 					this.options.placeholder = this.options.placeholder || 'Insert text here...';
 					this.options.readOnly = this.options.readOnly !== undefined ? this.options.readOnly : false;
+					this.options.scrollingContainer = this.options.scrollingContainer || '#quill';
 
 					// Create quill instance
 					this.quill = new Quill(this.$refs.editor, this.options);
@@ -149,11 +150,16 @@
 <style lang="scss">
 
 	.quill-editor {
-		width: 50rem;
+		width: 100%;
 
 		img {
 			max-width: 100%;
 		}
+	}
+
+	#quill {
+		height: 70vh;
+		overflow-y: auto;
 	}
 
 	.ql-editor {
