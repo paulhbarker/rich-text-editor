@@ -5,7 +5,7 @@
 				<input ref="title" class="input" type="text" name="title" id="title" placeholder="Article Title">
 				<editor @change="enableButton()" ref="editor"></editor>
 				<button class="btn" @click.prevent="email()" :disabled="disabled">{{ this.sending ? 'Sending...' : this.button }}</button>
-				<input type="submit" value="Submit" @click.prevent="submit()">
+				<input type="submit" value="Preview" @click.prevent="submit()">
 			</form>
 		</div>
 		<div class="output-wrapper">
