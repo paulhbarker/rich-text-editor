@@ -1,9 +1,10 @@
 <template>
-	<div class="forms">
+	<div class="columns">
 		<div class="form-wrapper">
 			<form action="/submissions" ref="form">
 				<input ref="title" class="input" type="text" name="title" id="title" placeholder="Article Title">
-				<editor ref="editor"></editor>
+				<editor @change="enableButton()" ref="editor"></editor>
+				<button class="btn" @click.prevent="email()" :disabled="disabled">{{ this.sending ? 'Sending...' : this.button }}</button>
 				<input type="submit" value="Submit" @click.prevent="submit()">
 			</form>
 		</div>
@@ -11,7 +12,6 @@
 			<div class="output" ref="output"></div>
 		</div>
 	</div>
-
 </template>
 
 <script>
@@ -19,7 +19,13 @@
 	export default {
 		name: 'advanced-form',
 		components: { Editor },
-
+		data() {
+			return {
+				sending: false,
+				button: 'Send Report',
+				disabled: false
+			}
+		},
 		methods: {
 			submit() {
 				axios.post('/submissions', {
@@ -35,60 +41,40 @@
 					this.$refs.output.innerHTML = output;
 
 				}).catch( (err) => console.log(err) );
+			},
+
+			email() {
+				this.sending = true;
+				const before = this.$refs.editor.content;
+				axios.post('/submissions', {
+					title: this.$refs.title.value,
+					body: this.$refs.editor.content
+
+				}).then( (res) => {
+					const after = res.data.data.body;
+					axios.post('/mail', {
+
+						before: before,
+						after: after
+
+					}).then( (res) => {
+						this.button = 'Sent!';
+						this.sending = false;
+						this.disabled = true;
+
+					}).catch( (err) => console.log(err) )
+				}).catch( (err) => console.log(err) )
+			},
+
+			enableButton() {
+				this.button = 'Send Report';
+				this.disabled = false;
 			}
 		}
 	}
 </script>
 
 <style lang="scss">
-	h1 {
-		letter-spacing: -2px;
-	}
 
-	.forms {
-		display: flex;
-	}
-
-	.input {
-		width: 50%;
-		margin-bottom: 1rem;
-		padding: 1rem;
-		border: 1px solid #ccc;
-	}
-
-	.form-wrapper, .output-wrapper {
-		width: 50%;
-		padding: 2rem;
-		height: 100vh;
-	}
-
-	.form-wrapper {
-		background: #fff;
-	}
-
-	.output-wrapper {
-		border-left: 1px solid #ccc;
-		overflow-y: auto;
-
-		.output {
-			width: 80%;
-			margin: 0 auto;
-		}
-
-		h2 {
-			font-size: 1.5rem;
-			font-family: 'Droid Serif', serif;
-			font-weight: 700;
-		}
-	}
-
-	input[type=submit] {
-		background: transparent;
-		border: 1px solid #ccc;
-		padding: 1rem 2rem;
-		font-size: 1.2rem;
-		margin-top: 1rem;
-		float: right;
-	}
 
 </style>

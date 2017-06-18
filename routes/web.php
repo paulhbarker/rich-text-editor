@@ -17,3 +17,6 @@ Route::get('/', function () {
 
 Route::get('/', 'TestController@index');
 Route::post('/submissions', 'TestController@submit');
+
+Route::get('/html', 'TestController@html');
+Route::post('/mail', 'TestController@mail');

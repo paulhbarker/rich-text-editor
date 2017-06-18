@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\DebugMail;
 use App\Services\Purifier;
 use Illuminate\Http\Request;
 
@@ -23,5 +24,14 @@ class TestController extends Controller
 	        'success' => true,
 	        'status' => 200
 	    ]);
+    }
+
+    public function mail(Request $request)
+    {
+    	\Mail::to(env('EMAIL'))->send(new DebugMail($request->before, $request->after));
+    }
+
+    public function html() {
+    	return view('html');
     }
 }

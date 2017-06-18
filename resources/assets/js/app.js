@@ -17,6 +17,7 @@ window.Vue = require('vue');
 
 Vue.component('editor', require('./components/Editor.vue'));
 Vue.component('advanced-form', require('./components/AdvancedForm.vue'));
+Vue.component('html-form', require('./components/HtmlForm.vue'));
 
 const app = new Vue({
     el: '#app',

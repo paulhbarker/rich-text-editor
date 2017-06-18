@@ -149,23 +149,4 @@
 
 <style lang="scss">
 
-	.quill-editor {
-		width: 100%;
-
-		img {
-			max-width: 100%;
-		}
-	}
-
-	#quill {
-		height: 70vh;
-		overflow-y: auto;
-	}
-
-	.ql-editor {
-		p {
-			margin-bottom: 1rem !important;
-		}
-	}
-
 </style>
