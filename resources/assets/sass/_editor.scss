@@ -1,0 +1,68 @@
+$editor-height: 700px;
+$ck-height: $editor-height + 41;
+
+.editor-wrapper {
+	position: relative;
+
+	.placeholder {
+		position: absolute;
+		height: $ck-height;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: #F5F5F5;
+	}
+
+	#ck-container {
+		background: #fff;
+		transition: all .4s ease;
+	}
+
+	.loading {
+		transform: scale(0);
+		opacity: 0;
+	}
+
+	textarea {
+		height: $ck-height;
+	}
+
+	.cke_bottom {
+		display: none !important;
+	}
+
+	.cke_top {
+		background-color: #fff !important;
+
+		a.cke_button:last-child:after {
+			display: none;
+		}
+
+		.cke_toolbar_separator {
+			display: none;
+		}
+
+		.cke_button {
+			padding: .5rem;
+
+			&:hover {
+				border: none;
+			}
+		}
+
+		.cke_toolbar {
+			margin-right: 1rem;
+		}
+
+		.cke_button_on {
+			border: none;
+		}
+	}
+}
+
+.zoomIn {
+	transform: scale(1);
+	opacity: 1;
+}
+

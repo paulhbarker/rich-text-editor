@@ -24,7 +24,7 @@ class Purifier  {
 		$config->loadArray([
 			'Core.Encoding' => 'UTF-8',
 			'HTML.Doctype' => 'HTML 4.01 Strict',
-			'HTML.Allowed' => 'h1,h2,b,strong,i,em,a[href|title],ul,ol,li,p[style],br,span[style],img[alt|src],figure,figcaption,hr',
+			'HTML.Allowed' => 'h1,h2,b,strong,i,em,a[href|title],ul,ol,li,p[style],br,span[style],img[alt|src],figure,figcaption,hr,blockquote',
 			'CSS.AllowedProperties' => 'font,font-size,font-weight,font-style,font-family,text-decoration,color,background-color,text-align',
 			'AutoFormat.AutoParagraph' => true,
 			'AutoFormat.Linkify' => true,

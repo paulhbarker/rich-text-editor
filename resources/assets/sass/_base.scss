@@ -35,6 +35,26 @@ p {
 	line-height: 2;
 }
 
+ul {
+	list-style: circle inside;
+	margin-bottom: 2.5rem;
+
+	li {
+		font-size: ms(1);
+		line-height: 2;
+	}
+}
+
+ol {
+	list-style: decimal inside;
+	margin-bottom: 2.5rem;
+
+	li {
+		font-size: ms(1);
+		line-height: 2;
+	}
+}
+
 strong {
 	font-weight: 700;
 }

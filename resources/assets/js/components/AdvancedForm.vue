@@ -2,10 +2,11 @@
 	<div class="columns">
 		<div class="form-wrapper">
 			<form action="/submissions" method="POST" ref="form">
-
 				<input v-model="title" ref="title" class="input" type="text" name="title" id="title" placeholder="Article Title">
 
-				<editor v-model="content" id="ckeditor" name="body" :initialValue="value"></editor>
+				<editor v-model="content" id="ckeditor" name="body" @input="releaseButton()" :initialValue="value"></editor>
+
+				<button class="btn" @click.prevent="email()" :disabled="disabled">{{ sending ? 'Sending...' : button }}</button>
 
 				<input type="submit" value="Preview" @click.prevent="submit()">
 			</form>
@@ -26,8 +27,8 @@
 			return {
 				title: '',
 				content: this.value,
-				sending: false,
 				button: 'Send Report',
+				sending: false,
 				disabled: false
 			}
 		},
@@ -53,19 +54,19 @@
 
 			email() {
 				this.sending = true;
-				const before = this.$refs.editor.content;
 				axios.post('/submissions', {
+
 					title: this.title,
 					body: this.content
 
 				}).then( (res) => {
-					const after = res.data.data.body;
 					axios.post('/mail', {
 
-						before: before,
-						after: after
+						before: this.content,
+						after: res.data.data.body
 
 					}).then( (res) => {
+
 						this.button = 'Sent!';
 						this.sending = false;
 						this.disabled = true;
@@ -74,8 +75,9 @@
 				}).catch( (err) => console.log(err) )
 			},
 
-			onContentChange(html) {
-				console.log(html);
+			releaseButton() {
+				this.button = 'Send Report';
+				this.disabled = false;
 			},
 
 			enableButton() {

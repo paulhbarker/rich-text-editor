@@ -13,7 +13,7 @@
 			return {
 				instance: {},
 				options: {
-					height: '60vh'
+					height: '700px'
 				},
 				ready: false,
 			}

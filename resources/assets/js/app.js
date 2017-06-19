@@ -21,6 +21,4 @@ Vue.component('html-form', require('./components/HtmlForm.vue'));
 
 const app = new Vue({
     el: '#app',
-
-    // components: { editor }
 });
