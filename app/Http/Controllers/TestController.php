@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\DebugMail;
 use App\Services\Purifier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TestController extends Controller
 {
@@ -36,13 +37,27 @@ class TestController extends Controller
     }
 
     public function upload(Request $request) {
-    	return json_encode([
-    		'uploaded' => 1,
-//    		'error' => [
-//    			'message' => 'Hmmm...'
-//		    ],
-    		'fileName' => 'foo.jpg',
-	        'url' => 'https://www.w3schools.com/css/trolltunga.jpg'
+
+    	$file = $request->file('file');
+
+    	try
+	    {
+		    $path = Storage::putFileAs('/', $file, $file->getClientOriginalName());
+
+	    } catch (\Exception $e)
+	    {
+		    return json_encode([
+			    'uploaded' => 0,
+			    'error' => [
+				    'message' => $e->getMessage()
+			    ],
+		    ]);
+	    }
+
+	    return json_encode([
+		    'uploaded' => 1,
+            'fileName' => $file->getClientOriginalName(),
+            'url' => Storage::url($file->getClientOriginalName())
 	    ]);
     }
 }

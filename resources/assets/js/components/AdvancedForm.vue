@@ -1,10 +1,12 @@
 <template>
 	<div class="columns">
 		<div class="form-wrapper">
-			<form action="/submissions" ref="form">
-				<input ref="title" class="input" type="text" name="title" id="title" placeholder="Article Title">
-				<editor @change="enableButton()" ref="editor"></editor>
-				<button class="btn" @click.prevent="email()" :disabled="disabled">{{ this.sending ? 'Sending...' : this.button }}</button>
+			<form action="/submissions" method="POST" ref="form">
+
+				<input v-model="title" ref="title" class="input" type="text" name="title" id="title" placeholder="Article Title">
+
+				<editor v-model="content" id="ckeditor" name="body" :initialValue="value"></editor>
+
 				<input type="submit" value="Preview" @click.prevent="submit()">
 			</form>
 		</div>
@@ -19,18 +21,24 @@
 	export default {
 		name: 'advanced-form',
 		components: { Editor },
+
 		data() {
 			return {
+				title: '',
+				content: this.value,
 				sending: false,
 				button: 'Send Report',
 				disabled: false
 			}
 		},
+
+		props: ['value'],
+
 		methods: {
 			submit() {
 				axios.post('/submissions', {
-					title: this.$refs.title.value,
-					body: this.$refs.editor.content
+					title: this.title,
+					body: this.content
 
 				}).then( (res) => {
 
@@ -47,8 +55,8 @@
 				this.sending = true;
 				const before = this.$refs.editor.content;
 				axios.post('/submissions', {
-					title: this.$refs.title.value,
-					body: this.$refs.editor.content
+					title: this.title,
+					body: this.content
 
 				}).then( (res) => {
 					const after = res.data.data.body;
@@ -66,11 +74,15 @@
 				}).catch( (err) => console.log(err) )
 			},
 
+			onContentChange(html) {
+				console.log(html);
+			},
+
 			enableButton() {
 				this.button = 'Send Report';
 				this.disabled = false;
 			}
-		}
+		},
 	}
 </script>
 

@@ -2,52 +2,40 @@
 	<div class="top">
 		<div class="loader"></div>
 		<div id="ck-container" ref="container" :class="ready ? 'slideIn' : 'loading'">
-			<textarea id='editor'></textarea>
+			<c-k-editor v-model="value"
+			            :name="name"
+			            :value="initialValue"
+			            @input="updateField"
+			            @ready="showEditor()"
+			            id="editor">
+			</c-k-editor>
 		</div>
 	</div>
 </template>
 
 <script>
-	import scriptjs from 'scriptjs'
+	import CKEditor from './CKEditor.vue'
 
 	export default {
 		name: 'editor',
+		components: { CKEditor },
 
 		data() {
 			return {
-				editor: {},
-				options: {
-					height: '60vh'
-				},
 				ready: false,
+				value: this.initialValue,
 			}
 		},
 
-		created() {
-			scriptjs('/js/vendor/ckeditor/ckeditor.js', () => {
-				this.editor = CKEDITOR.replace('editor', this.options);
-
-				this.editor.on('fileUploadRequest', (evt) => this.uploadFile(evt));
-
-				this.ready = true;
-			});
-		},
+		props: [ 'name','initialValue' ],
 
 		methods: {
-			getToken() {
-				let token = document.head.querySelector('meta[name="csrf-token"]');
-
-				return token ? token.content : '';
+			showEditor() {
+				this.ready = true;
 			},
 
-			uploadFile(evt) {
-				const xhr = evt.data.fileLoader.xhr;
-
-				xhr.setRequestHeader('X-CSRF-TOKEN', this.getToken());
-
-				xhr.send( evt.data.fileLoader.file );
-
-//				evt.stop();
+			updateField: function() {
+				this.$emit('input', this.value);
 			}
 		}
 	}

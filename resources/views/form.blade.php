@@ -10,9 +10,7 @@
 </head>
 <body>
 	<div id="app">
-
 		<advanced-form></advanced-form>
-
 	</div>
 
 	<script src="/js/app.js"></script>

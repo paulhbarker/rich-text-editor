@@ -24,7 +24,7 @@ class Purifier  {
 		$config->loadArray([
 			'Core.Encoding' => 'UTF-8',
 			'HTML.Doctype' => 'HTML 4.01 Strict',
-			'HTML.Allowed' => 'h1,h2,b,strong,i,em,a[href|title],ul,ol,li,p[style],br,span[style],img[alt|src],figure,figcaption',
+			'HTML.Allowed' => 'h1,h2,b,strong,i,em,a[href|title],ul,ol,li,p[style],br,span[style],img[alt|src],figure,figcaption,hr',
 			'CSS.AllowedProperties' => 'font,font-size,font-weight,font-style,font-family,text-decoration,color,background-color,text-align',
 			'AutoFormat.AutoParagraph' => true,
 			'AutoFormat.Linkify' => true,
@@ -33,6 +33,12 @@ class Purifier  {
 		]);
 
 		$def = $config->getHTMLDefinition(true);
+
+		// Add figure and figcaption
+		$def->addElement('figure', 'Block', 'Optional: (figcaption, Flow) | (Flow, figcaption) | Flow', 'Common');
+		$def->addElement('figcaption', 'Inline', 'Flow', 'Common');
+
+		// replace <b> and <i> with <strong> and <em>
 		$def->info_tag_transform['b'] = new HTMLPurifier_TagTransform_Simple('strong');
 		$def->info_tag_transform['i'] = new HTMLPurifier_TagTransform_Simple('em');
 		

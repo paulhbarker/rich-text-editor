@@ -2011,26 +2011,34 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
 	name: 'advanced-form',
 	components: { Editor: __WEBPACK_IMPORTED_MODULE_0__Editor_vue___default.a },
+
 	data: function data() {
 		return {
+			title: '',
+			content: this.value,
 			sending: false,
 			button: 'Send Report',
 			disabled: false
 		};
 	},
 
+
+	props: ['value'],
+
 	methods: {
 		submit: function submit() {
 			var _this = this;
 
 			axios.post('/submissions', {
-				title: this.$refs.title.value,
-				body: this.$refs.editor.content
+				title: this.title,
+				body: this.content
 
 			}).then(function (res) {
 
@@ -2052,8 +2060,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			this.sending = true;
 			var before = this.$refs.editor.content;
 			axios.post('/submissions', {
-				title: this.$refs.title.value,
-				body: this.$refs.editor.content
+				title: this.title,
+				body: this.content
 
 			}).then(function (res) {
 				var after = res.data.data.body;
@@ -2073,6 +2081,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				return console.log(err);
 			});
 		},
+		onContentChange: function onContentChange(html) {
+			console.log(html);
+		},
 		enableButton: function enableButton() {
 			this.button = 'Send Report';
 			this.disabled = false;
@@ -2086,8 +2097,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_scriptjs__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_scriptjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_scriptjs__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CKEditor_vue__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CKEditor_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__CKEditor_vue__);
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2102,45 +2119,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = ({
 	name: 'editor',
+	components: { CKEditor: __WEBPACK_IMPORTED_MODULE_0__CKEditor_vue___default.a },
 
 	data: function data() {
 		return {
-			editor: {},
-			options: {
-				height: '60vh'
-			},
-			ready: false
+			ready: false,
+			value: this.initialValue
 		};
 	},
-	created: function created() {
-		var _this = this;
 
-		__WEBPACK_IMPORTED_MODULE_0_scriptjs___default()('/js/vendor/ckeditor/ckeditor.js', function () {
-			_this.editor = CKEDITOR.replace('editor', _this.options);
 
-			_this.editor.on('fileUploadRequest', function (evt) {
-				return _this.uploadFile(evt);
-			});
-
-			_this.ready = true;
-		});
-	},
-
+	props: ['name', 'initialValue'],
 
 	methods: {
-		getToken: function getToken() {
-			var token = document.head.querySelector('meta[name="csrf-token"]');
-
-			return token ? token.content : '';
+		showEditor: function showEditor() {
+			this.ready = true;
 		},
-		uploadFile: function uploadFile(evt) {
-			var xhr = evt.data.fileLoader.xhr;
 
-			xhr.setRequestHeader('X-CSRF-TOKEN', this.getToken());
 
-			xhr.send(evt.data.fileLoader.file);
-
-			//				evt.stop();
+		updateField: function updateField() {
+			this.$emit('input', this.value);
 		}
 	}
 });
@@ -2651,9 +2649,16 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('form', {
     ref: "form",
     attrs: {
-      "action": "/submissions"
+      "action": "/submissions",
+      "method": "POST"
     }
   }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.title),
+      expression: "title"
+    }],
     ref: "title",
     staticClass: "input",
     attrs: {
@@ -2661,26 +2666,30 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "name": "title",
       "id": "title",
       "placeholder": "Article Title"
-    }
-  }), _vm._v(" "), _c('editor', {
-    ref: "editor",
-    on: {
-      "change": function($event) {
-        _vm.enableButton()
-      }
-    }
-  }), _vm._v(" "), _c('button', {
-    staticClass: "btn",
-    attrs: {
-      "disabled": _vm.disabled
+    },
+    domProps: {
+      "value": (_vm.title)
     },
     on: {
-      "click": function($event) {
-        $event.preventDefault();
-        _vm.email()
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.title = $event.target.value
       }
     }
-  }, [_vm._v(_vm._s(this.sending ? 'Sending...' : this.button))]), _vm._v(" "), _c('input', {
+  }), _vm._v(" "), _c('editor', {
+    attrs: {
+      "id": "ckeditor",
+      "name": "body",
+      "initialValue": _vm.value
+    },
+    model: {
+      value: (_vm.content),
+      callback: function($$v) {
+        _vm.content = $$v
+      },
+      expression: "content"
+    }
+  }), _vm._v(" "), _c('input', {
     attrs: {
       "type": "submit",
       "value": "Preview"
@@ -2768,11 +2777,26 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "id": "ck-container"
     }
-  }, [_c('textarea', {
+  }, [_c('c-k-editor', {
     attrs: {
+      "name": _vm.name,
+      "value": _vm.initialValue,
       "id": "editor"
+    },
+    on: {
+      "input": _vm.updateField,
+      "ready": function($event) {
+        _vm.showEditor()
+      }
+    },
+    model: {
+      value: (_vm.value),
+      callback: function($$v) {
+        _vm.value = $$v
+      },
+      expression: "value"
     }
-  })])])
+  })], 1)])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -12626,6 +12650,183 @@ module.exports = g;
 __webpack_require__(11);
 module.exports = __webpack_require__(12);
 
+
+/***/ }),
+/* 52 */,
+/* 53 */,
+/* 54 */,
+/* 55 */,
+/* 56 */,
+/* 57 */,
+/* 58 */,
+/* 59 */,
+/* 60 */,
+/* 61 */,
+/* 62 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_scriptjs__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_scriptjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_scriptjs__);
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+	data: function data() {
+		return {
+			instance: {},
+			options: {
+				height: '60vh'
+			},
+			ready: false
+		};
+	},
+
+
+	props: {
+		name: {
+			type: String,
+			default: function _default() {
+				return 'editor-' + ++inc;
+			}
+		},
+		value: {
+			type: String
+		},
+		id: {
+			type: String,
+			default: function _default() {
+				return 'editor-' + inc;
+			}
+		}
+	},
+
+	beforeUpdate: function beforeUpdate() {
+		if (this.value !== this.instance.getData()) {
+			this.instance.setData(this.value);
+		}
+	},
+	mounted: function mounted() {
+		var _this = this;
+
+		__WEBPACK_IMPORTED_MODULE_0_scriptjs___default()('/js/vendor/ckeditor/ckeditor.js', function () {
+			_this.instance = CKEDITOR.replace('editor', _this.options);
+
+			_this.instance.on('fileUploadRequest', function (evt) {
+				return _this.uploadFile(evt);
+			});
+			_this.instance.on('change', function () {
+				return _this.emitChangedEvent();
+			});
+
+			_this.$emit('ready');
+		});
+	},
+
+
+	methods: {
+		getToken: function getToken() {
+			var token = document.head.querySelector('meta[name="csrf-token"]');
+
+			return token ? token.content : '';
+		},
+		uploadFile: function uploadFile(evt) {
+			var _evt$data$fileLoader = evt.data.fileLoader,
+			    xhr = _evt$data$fileLoader.xhr,
+			    file = _evt$data$fileLoader.file;
+
+			xhr.setRequestHeader('X-CSRF-TOKEN', this.getToken());
+
+			var formData = new FormData();
+			formData.append('file', file);
+
+			xhr.send(formData);
+
+			evt.stop();
+		},
+		emitChangedEvent: function emitChangedEvent() {
+			var html = this.instance.getData();
+			if (html !== this.value) {
+				this.$emit('input', html);
+			}
+		}
+	},
+
+	beforeDestroy: function beforeDestroy() {
+		if (this.instance) {
+			this.instance.focusManager.blur(true);
+			this.instance.removeAllListeners();
+			this.instance.destroy();
+			this.instance = null;
+		}
+	}
+});
+
+/***/ }),
+/* 63 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(3)(
+  /* script */
+  __webpack_require__(62),
+  /* template */
+  __webpack_require__(64),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "C:\\Users\\paul\\web\\rich-text-editor\\resources\\assets\\js\\components\\CKEditor.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] CKEditor.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1ce33445", Component.options)
+  } else {
+    hotAPI.reload("data-v-1ce33445", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 64 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "ckeditor"
+  }, [_c('textarea', {
+    attrs: {
+      "id": _vm.id,
+      "name": _vm.name
+    },
+    domProps: {
+      "value": _vm.value
+    }
+  })])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-1ce33445", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);
