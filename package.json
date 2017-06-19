@@ -16,6 +16,7 @@
     "lodash": "^4.17.4",
     "modularscale-sass": "^3.0.3",
     "quill": "^1.2.6",
+    "scriptjs": "^2.5.8",
     "vue": "^2.1.10"
   },
   "dependencies": {}

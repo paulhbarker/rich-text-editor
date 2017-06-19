@@ -1,152 +1,100 @@
 <template>
-	<div class="quill-editor">
-		<slot name="toolbar"></slot>
-		<div id='quill' ref="editor"></div>
+	<div class="top">
+		<div class="loader"></div>
+		<div id="ck-container" ref="container" :class="ready ? 'slideIn' : 'loading'">
+			<textarea id='editor'></textarea>
+		</div>
 	</div>
 </template>
 
 <script>
-	import Quill from 'quill'
-	import 'quill/dist/quill.snow.css'
+	import scriptjs from 'scriptjs'
 
 	export default {
 		name: 'editor',
 
 		data() {
 			return {
-				content: '',
-				quill: {},
-
-				defaultModules: {
-					toolbar: [
-						['bold', 'italic', 'underline'],
-						['blockquote', { 'header': 2 }],
-						[{ 'list': 'ordered' }, { 'list': 'bullet' }],
-						[{ 'indent': '-1' }, { 'indent': '+1' }],
-						[{ 'color': [] }, { 'background': [] }],
-						[{ 'align': [] }],
-						['link', 'image', 'video'],
-						['clean'],
-					]
+				editor: {},
+				options: {
+					height: '60vh'
 				},
+				ready: false,
 			}
 		},
 
-		props: {
-			value: String,
-			disabled: Boolean,
-			options: {
-				type: Object,
-				required: false,
-				default() {
-					return {}
-				}
-			}
-		},
+		created() {
+			scriptjs('/js/vendor/ckeditor/ckeditor.js', () => {
+				this.editor = CKEDITOR.replace('editor', this.options);
 
-		mounted() {
-			this.initialize()
-		},
+				this.editor.on('fileUploadRequest', (evt) => this.uploadFile(evt));
 
-		beforeDestroy() {
-			this.quill = null
+				this.ready = true;
+			});
 		},
 
 		methods: {
-			initialize() {
-				if ( this.$el ) {
+			getToken() {
+				let token = document.head.querySelector('meta[name="csrf-token"]');
 
-					// Set options
-					this.options.theme = this.options.theme || 'snow';
-					this.options.boundary = this.options.boundary || document.body;
-					this.options.modules = this.options.modules || this.defaultModules;
-					this.options.modules.toolbar = this.options.modules.toolbar !== undefined
-						? this.options.modules.toolbar
-						: this.defaultModules.toolbar;
-					this.options.placeholder = this.options.placeholder || 'Insert text here...';
-					this.options.readOnly = this.options.readOnly !== undefined ? this.options.readOnly : false;
-					this.options.scrollingContainer = this.options.scrollingContainer || '#quill';
-
-					// Create quill instance
-					this.quill = new Quill(this.$refs.editor, this.options);
-					this.addImageHandler();
-
-					// Set editor content
-					if ( this.value ) {
-						this.quill.pasteHTML(this.value)
-					}
-
-					// Mark model as touched if editor lost focus
-					this.quill.on('selection-change', (range) => {
-						if ( ! range ) {
-							this.$emit('blur', this.quill)
-						} else {
-							this.$emit('focus', this.quill)
-						}
-					});
-
-					// update model if text changes
-					this.quill.on('text-change', (delta, oldDelta, source) => {
-						const html = this.$refs.editor.children[0].innerHTML;
-						const text = this.quill.getText();
-
-						this.content = html;
-
-						this.$emit('input', this.content);
-						this.$emit('change', {
-							editor: this.quill,
-							html: html,
-							text: text
-						});
-					});
-
-					// emit ready
-					this.$emit('ready', this.quill)
-				}
+				return token ? token.content : '';
 			},
 
-			addImageHandler() {
-				const toolbar = this.quill.getModule('toolbar');
+			uploadFile(evt) {
+				const xhr = evt.data.fileLoader.xhr;
 
-				toolbar.addHandler('image', function () {
-					const response = {
-						data: {
-							id: 1,
-							path: 'https://www.w3schools.com/css/trolltunga.jpg',
-							caption: 'This is a caption'
-						},
-						success: true,
-						status: 200
-					};
-					this.quill.pasteHTML(
-						this.quill.selection.savedRange.index,
-						`<img src='${ response.data.path }'>`
-					);
-				});
+				xhr.setRequestHeader('X-CSRF-TOKEN', this.getToken());
+
+				xhr.send( evt.data.fileLoader.file );
+
+//				evt.stop();
 			}
-		},
-
-		watch: {
-			content: (newVal) => {
-				if ( this.quill ) {
-					if ( !! newVal && newVal !== this.content ) {
-						this.content = newVal;
-						this.quill.pasteHTML(newVal);
-					} else if ( ! newVal ) {
-						this.quill.setText('');
-					}
-				}
-			},
-
-			disabled: (newVal) => {
-				if ( this.quill ) {
-					this.quill.enable(!newVal);
-				}
-			}
-		},
+		}
 	}
 </script>
 
 <style lang="scss">
+	$editor-height: 611px;
+
+	#ck-container {
+		background: #fff;
+		transition: all .4s ease;
+	}
+
+	.loader {
+		position: absolute;
+		height: $editor-height;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: #F5F5F5;
+	}
+
+	.top {
+		position: relative;
+	}
+
+	.loading {
+		transform: scale(0);
+		opacity: 0;
+	}
+
+	.slideIn {
+		transform: scale(1);
+		opacity: 1;
+	}
+
+	textarea {
+		height: $editor-height;
+	}
+
+	.cke_bottom {
+		display: none !important;
+	}
+
+	.cke_top {
+		background-color: #fff !important;
+	}
 
 </style>

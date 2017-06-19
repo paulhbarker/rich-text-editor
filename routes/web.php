@@ -20,3 +20,4 @@ Route::post('/submissions', 'TestController@submit');
 
 Route::get('/html', 'TestController@html');
 Route::post('/mail', 'TestController@mail');
+Route::post('upload', 'TestController@upload');

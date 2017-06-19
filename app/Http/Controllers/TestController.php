@@ -34,4 +34,15 @@ class TestController extends Controller
     public function html() {
     	return view('html');
     }
+
+    public function upload(Request $request) {
+    	return json_encode([
+    		'uploaded' => 1,
+//    		'error' => [
+//    			'message' => 'Hmmm...'
+//		    ],
+    		'fileName' => 'foo.jpg',
+	        'url' => 'https://www.w3schools.com/css/trolltunga.jpg'
+	    ]);
+    }
 }
